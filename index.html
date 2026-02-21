@@ -3,68 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Interface</title>
+    <title>Escape Poison Tsunami</title>
     <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #333;
-            color: #fff;
-        }
-        canvas {
-            display: block;
-            margin: auto;
-            border: 1px solid #fff;
-        }
-        #hud {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            z-index: 10;
-        }
-        #shop-modal, #wheel-modal, #game-over {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.8);
-            padding: 20px;
-            border: 1px solid #fff;
-            border-radius: 10px;
-        }
-        #shop-modal.active, #wheel-modal.active, #game-over.active {
-            display: block;
-        }
+        body { margin: 0; font-family: Arial, sans-serif; }
+        canvas { display: block; margin: 0 auto; background-color: #000; }
+        #hud { position: absolute; color: white; }
     </style>
 </head>
 <body>
     <canvas id="gameCanvas" width="800" height="600"></canvas>
     <div id="hud">
-        <h1>Game HUD</h1>
-        <p>Score: <span id="score">0</span></p>
-        <p>Lives: <span id="lives">3</span></p>
-    </div>
-    <div id="shop-modal" class="modal">
-        <h2>Shop</h2>
-        <p>Buy items here.</p>
-        <button onclick="closeShop()">Close</button>
-    </div>
-    <div id="wheel-modal" class="modal">
-        <h2>Spin the Wheel</h2>
-        <p>Try your luck!</p>
-        <button onclick="closeWheel()">Close</button>
-    </div>
-    <div id="game-over" class="modal">
-        <h2>Game Over</h2>
-        <p>Your score was <span id="final-score">0</span></p>
-        <button onclick="restartGame()">Restart</button>
+        Score: <span id="score">0</span> | 
+        Coins: <span id="coins">0</span> | 
+        Speed Level: <span id="speed-level">1</span> | 
+        Lives: <span id="lives">3</span>
     </div>
     <script>
-        // JavaScript for game logic, opening modals, etc.
-        function closeShop() { document.getElementById('shop-modal').classList.remove('active'); }
-        function closeWheel() { document.getElementById('wheel-modal').classList.remove('active'); }
-        function restartGame() { /* restart logic */ }
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        let score = 0, coins = 0, speed = 1, lives = 3;
+        let player = { x: 50, y: 550, width: 30, height: 30 };  
+        let timers = [];
+
+        function drawPlayer() {
+            ctx.fillStyle = 'blue';
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+        }
+
+        function updateHUD() {
+            document.getElementById('score').innerText = score;
+            document.getElementById('coins').innerText = coins;
+            document.getElementById('speed-level').innerText = speed;
+            document.getElementById('lives').innerText = lives;
+        }
+
+        function spawnTsunami() {
+            timers.push(setTimeout(() => {
+                // Logic to display poison tsunami
+                ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                lives--;
+                updateHUD();
+                if (lives > 0) spawnTsunami();
+            }, 25000));
+        }
+
+        function shopUpgrades() {
+            // Logic for VIP shop and speed upgrades
+            speed += 1; // Add your shop logic here
+        }
+
+        function handleCollision() {
+            // Logic for collision detection with safe bases or brainrots
+        }
+
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawPlayer();
+            updateHUD();
+            handleCollision();
+            requestAnimationFrame(gameLoop);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if(e.key === 'ArrowRight') player.x += 5 * speed;
+            if(e.key === 'ArrowLeft') player.x -= 5 * speed;
+            if(e.key === 'ArrowUp') player.y -= 5 * speed;
+            if(e.key === 'ArrowDown') player.y += 5 * speed;
+        });
+
+        spawningVIPUpgrades();
+        spawnTsunami();
+        gameLoop();
     </script>
 </body>
 </html>
